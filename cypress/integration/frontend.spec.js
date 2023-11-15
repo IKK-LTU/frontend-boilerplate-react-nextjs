@@ -53,7 +53,7 @@ describe('Frontend Test Spec', () => {
     cy.get('[data-testid=submit]').click()
 
     // Complete step 2
-    const phone = "+1 2345678"
+    const phone = "+12345678"
     const email = "bob@bobson.com"
     cy.get('[data-testid=phone]').type(phone)
     cy.get('[data-testid=email]').type(email)
@@ -78,6 +78,7 @@ describe('Frontend Test Spec', () => {
     cy.get('[data-testid=allergies]').should('have.value', allergies)
 
     // Click the back button
+    cy.wait(300)
     cy.get('[data-testid=back]').click()
 
     // Verify that the data is preserved
@@ -108,20 +109,28 @@ describe('Frontend Test Spec', () => {
     cy.get('form').should('contain.text', "Age must be a number")
 
     // Verify that invalid values are proccessed correctly
-    const firstName = "1000"
-    const lastName = "1000"
-    const age = "-1000"
-    cy.get('[data-testid=firstName]').type(firstName)
-    cy.get('[data-testid=lastName]').type(lastName)
-    cy.get('[data-testid=age]').type(age)
+    const errorFirstName = "1000"
+    const errorLastName = "1000"
+    const errorAge = "-1000"
+    cy.get('[data-testid=firstName]').type(errorFirstName)
+    cy.get('[data-testid=lastName]').type(errorLastName)
+    cy.get('[data-testid=age]').type(errorAge)
     cy.get('[data-testid=submit]').click()
 
     cy.get('form').should('contain.text', "First name should not contain numbers")
     cy.get('form').should('contain.text', "Last name should not contain numbers")
     cy.get('form').should('contain.text', "Age should be positive")
 
+    const firstName = "Bob"
+    const lastName = "Bobson"
+    const age = 30
+
+    cy.get('[data-testid=firstName]').clear().type(firstName)
+    cy.get('[data-testid=lastName]').clear().type(lastName)
+    cy.get('[data-testid=age]').clear().type(age)
+    cy.get('[data-testid=submit]').click()
+
     // Check Step2 validation
-    cy.visit('/step2')
 
     // Verify required validation
     cy.get('[data-testid=submit]').click()
@@ -129,9 +138,46 @@ describe('Frontend Test Spec', () => {
     cy.get('form').should('contain.text', "Email is a required field")
     cy.get('form').should('contain.text', "Phone number is a required field")
 
-    const email = "1000"
-    cy.get('[data-testid=email]').type(email)
+    const errorEmail = "1000"
+    cy.get('[data-testid=email]').type(errorEmail)
     cy.get('[data-testid=submit]').click()
     cy.get('form').should('contain.text', "Email should have correct format")
+
+    const phone = "+1 2345678"
+    const email = "bob@bobson.com"
+
+    cy.get('[data-testid=email]').clear().type(email)
+    cy.get('[data-testid=phone]').clear().type(phone)
+    cy.get('[data-testid=submit]').click()
+
+
+    // Check Step3 validation
+
+    // Verify required validation
+    cy.get('[data-testid=submit]').click()
+
+    cy.get('form').should('contain.text', "Seat is a required field")
+    cy.get('form').should('contain.text', "Food is a required field")
+    cy.get('form').should('contain.text', "Allergies is a required field")
+
+        // Complete step 3
+    const seat = "25B"
+    const food = "vegan"
+    const allergies = "peanuts, soy, gluten"
+    cy.get('[data-testid=seat]').type(seat)
+    cy.get('[data-testid=food]').type(food)
+    cy.get('[data-testid=allergies]').type(allergies)
+    cy.get('[data-testid=submit]').click()
+
+        // Validate the results
+    cy.get('[data-testid=firstName]').should('have.text', firstName)
+    cy.get('[data-testid=lastName]').should('have.text', lastName)
+    cy.get('[data-testid=age]').should('have.text', age)
+    cy.get('[data-testid=phone]').should('have.text', phone)
+    cy.get('[data-testid=email]').should('have.text', email)
+    cy.get('[data-testid=seat]').should('have.text', seat)
+    cy.get('[data-testid=food]').should('have.text', food)
+    cy.get('[data-testid=allergies]').should('have.text', allergies)
+
   })
 })

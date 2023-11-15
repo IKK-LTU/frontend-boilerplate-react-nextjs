@@ -8,6 +8,7 @@
     "test": "cypress run"
   },
   "devDependencies": {
-    "cypress": "^9.7.0"
+    "cypress": "^9.7.0",
+    "eslint": "^8.53.0"
   }
 }

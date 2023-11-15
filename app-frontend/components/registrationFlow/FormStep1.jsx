@@ -1,63 +1,89 @@
-import React from 'react'
+import { Formik } from 'formik'
+import * as Yup from 'yup'
 
-const FormStep1 = ({onSubmit, handleStateUpdate, formData}) => {
-	return (
-		<form 
-		className='w-96 p-4 flex flex-col gap-3 bg-blue-700'
-		onSubmit={onSubmit}
-	>
-		<h1>Login</h1>
-		<input 
-			className='w-full py-1 px-2'
-			type="text"
-			required
-			name="firstName"
-			id="firstName"
-			data-testid="firstName"
-			value={formData.firstName}
-			onChange={e => handleStateUpdate('firstName',e.target.value)}
-			placeholder="First name"
-		/>
-		<input 
-			className='w-full py-1 px-2'
-			type="text"
-			required
-			name="lastName"
-			id="lastName"
-			data-testid="lastName"
-			value={formData.lastName}
-			onChange={e => handleStateUpdate('lastName',e.target.value)}
-			placeholder="Last name"
-		/>
-		<input 
-			className='w-full py-1 px-2'
-			type="number"
-			required
-			name="age"
-			id="age"
-			data-testid="age"
-			value={formData.age}
-			onChange={e => handleStateUpdate('age',e.target.value)}
-			placeholder="Your age"
-		/>
-		<div className='flex flex-row gap-2'>
-		<button
-			className='w-1/2 px-3 py-2 bg-yellow-50'
-			type="button"
-			onClick={() => console.log(formData)}
-		 >
-			Back
-		</button>
-		<button 
-			className='w-1/2 px-3 py-2 bg-green-400'
-			type="submit"
-			data-testid="submit"
-		>
-			Next
-		</button>
-		</div>
-	</form>
-	)
+import ErrorText from '../elements/text/ErrorText'
+import PrimaryButton from '../elements/buttons/PrimaryButton'
+import DefaultInput from '../elements/inputs/DefaultInput.jsx'
+
+const validationSchema =
+  Yup.object().shape({
+    firstName: Yup.string()
+		.matches(/^[A-Za-z]+$/, 'First name should not contain numbers')
+		.required('First name is a required field'),
+    lastName: Yup.string().required('Required')
+		.matches(/^[A-Za-z]+$/, 'Last name should not contain numbers')
+		.required('Last name is a required field'),
+		age: Yup.number()
+    .required('Age must be a number')
+		.positive('Age should be positive')
+		.nullable()
+  })
+
+
+const FormStep1=({ onSubmit, formData}) => {
+
+  const initialValues = {
+    firstName: formData.firstName || '',
+    lastName: formData.lastName || '',
+    age: formData.age || undefined
+  }
+
+  return (
+		<div className='w-full h-full flex flex-col gap-3'>
+      <Formik
+        initialValues={initialValues}
+        validationSchema={validationSchema}
+        validateOnChange={false}
+        onSubmit={onSubmit}
+      >
+        {formik => {
+          return (
+            <form onSubmit={formik.handleSubmit} className='w-full h-full'>
+              <div className='w-full h-full flex flex-col gap-3'>
+                <h1 className="text-xl mb-3 text-center text-white font-semibold capitalize"
+                  data-testid="title"
+                >
+                  Step 1
+                </h1>
+                <DefaultInput
+                  id="firstName"
+                  value={formik.values.firstName}
+                  onChange={formik.handleChange}
+                  placeholder="First Name"
+                />
+                <DefaultInput
+                   id="lastName"
+                  value={formik.values.lastName}
+                  onChange={formik.handleChange}
+                  placeholder="Last Name"
+                />
+                <DefaultInput
+                  type="number"
+                  id="age"
+                  value={formik.values.age}
+                  onChange={formik.handleChange}
+                  placeholder="Age"
+                />
+
+								 {formik?.errors?.firstName && <ErrorText text={formik?.errors?.firstName} />}
+								 {formik?.errors?.lastName && <ErrorText text={formik?.errors?.lastName} />}
+								 {formik?.errors?.age && <ErrorText text={formik?.errors?.age} />}
+
+								<div className='flex flex-row gap-3 mt-auto'>
+                  <PrimaryButton
+                    testid="submit"
+                    type="submit"
+                    text="Next"
+                  />
+                </div>
+              </div>
+            </form>
+
+          )
+        }}
+      </Formik>
+    </div>
+  )
 }
 
 export default FormStep1
