@@ -23,7 +23,7 @@ const FormStep3=({onSubmit, onBack, formData}) => {
   }
 
   return (
-    <div className='w-full h-full  flex flex-col gap-3'>
+    <div className='w-full h-72 flex flex-col gap-3'>
 
       <Formik
         initialValues={initialValues}
